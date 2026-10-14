@@ -1,0 +1,48 @@
+# Example publication data. Replace these entries with your own work.
+# selected = true displays an item in the Selected Publications block on the homepage.
+
+[[publication]]
+title = "A Sample Paper on Scalable Scientific Computing"
+authors = "Your Name, Collaborator One, and Collaborator Two"
+venue = "Journal of Computational Methods"
+year = 2026
+selected = true
+doi = "https://doi.org/10.0000/example.2026.001"
+pdf = ""
+code = ""
+abstract = "A concise example entry showing how publications are rendered from a small data file."
+bibtex = """@article{yourname2026sample,
+  title   = {A Sample Paper on Scalable Scientific Computing},
+  author  = {Your Name and Collaborator One and Collaborator Two},
+  journal = {Journal of Computational Methods},
+  year    = {2026}
+}"""
+
+[[publication]]
+title = "Algorithms for Large Matrix Problems"
+authors = "Your Name and Collaborator One"
+venue = "Proceedings of an Example Conference"
+year = 2025
+selected = true
+doi = ""
+pdf = ""
+code = "https://github.com/"
+abstract = "An example conference publication with a code link."
+bibtex = """@inproceedings{yourname2025randomized,
+  title     = {Algorithms for Large Matrix Problems},
+  author    = {Your Name and Collaborator One},
+  booktitle = {Proceedings of an Example Conference},
+  year      = {2025}
+}"""
+
+[[publication]]
+title = "An Example Earlier Publication"
+authors = "Your Name"
+venue = "Applied Mathematics Letters"
+year = 2024
+selected = false
+doi = ""
+pdf = ""
+code = ""
+abstract = "A third example showing reverse-chronological publication ordering."
+bibtex = ""

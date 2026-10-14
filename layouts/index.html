@@ -1,0 +1,99 @@
+{{ define "main" }}
+{{ $p := .Site.Data.profile }}
+{{ $avatarShape := lower ($p.appearance.avatar_shape | default "circle") }}
+{{ if ne $avatarShape "square" }}{{ $avatarShape = "circle" }}{{ end }}
+
+<div class="content-shell home-shell">
+  <section class="profile-hero">
+    <div class="portrait-column">
+      {{ $avatar := $p.avatar }}
+      {{ $avatarURL := $avatar | relURL }}
+      {{ if or (hasPrefix $avatar "http://") (hasPrefix $avatar "https://") }}{{ $avatarURL = $avatar }}{{ end }}
+      <img src="{{ $avatarURL }}" alt="{{ $p.avatar_alt | default (printf "Portrait of %s" $p.name) }}" class="profile-avatar profile-avatar--{{ $avatarShape }}">
+
+      <div class="social-links" aria-label="Profile links">
+        {{ with $p.social.github }}{{ if ne . "" }}
+        <a href="{{ . }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7a9.5 9.5 0 0 0-3 18.5c.5.1.7-.2.7-.5v-1.8c-2.9.6-3.5-1.2-3.5-1.2-.5-1.2-1.2-1.5-1.2-1.5-1-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1 1 1.7 2.5 1.2 3.1.9.1-.7.4-1.2.7-1.5-2.3-.3-4.8-1.2-4.8-5.3 0-1.2.4-2.1 1.1-2.9-.1-.3-.5-1.4.1-2.9 0 0 .9-.3 3.1 1.1A10.7 10.7 0 0 1 12 6.7a10.7 10.7 0 0 1 2.8.4c2.2-1.4 3.1-1.1 3.1-1.1.6 1.5.2 2.6.1 2.9.7.8 1.1 1.7 1.1 2.9 0 4.1-2.5 5-4.8 5.3.4.3.7 1 .7 1.9v2.8c0 .3.2.6.7.5A9.5 9.5 0 0 0 12 2.7Z"/></svg>
+        </a>
+        {{ end }}{{ end }}
+
+        {{ with $p.social.scholar }}{{ if ne . "" }}
+        <a href="{{ . }}" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar" class="social-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 8.2l10 5.2 8-4.2v6h2v-7L12 3Zm-6 9.2V16c0 2 2.7 4 6 4s6-2 6-4v-3.8l-6 3.1-6-3.1Z"/></svg>
+        </a>
+        {{ end }}{{ end }}
+
+        {{ with $p.social.orcid }}{{ if ne . "" }}
+        <a href="{{ . }}" target="_blank" rel="noopener noreferrer" aria-label="ORCID" class="social-link social-text-link">iD</a>
+        {{ end }}{{ end }}
+
+        {{ with $p.social.linkedin }}{{ if ne . "" }}
+        <a href="{{ . }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8.1H3.2V21h3.3V8.1ZM4.8 3A1.9 1.9 0 1 0 4.8 6.8 1.9 1.9 0 0 0 4.8 3ZM21 13.6c0-3.9-2.1-5.8-4.9-5.8-2.3 0-3.3 1.2-3.8 2.1V8.1H9V21h3.3v-6.4c0-1.7.3-3.4 2.5-3.4 2.2 0 2.2 2 2.2 3.5V21H21v-7.4Z"/></svg>
+        </a>
+        {{ end }}{{ end }}
+
+        {{ with $p.social.website }}{{ if ne . "" }}
+        <a href="{{ . }}" target="_blank" rel="noopener noreferrer" aria-label="Website" class="social-link social-stroke-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.7 12h16.6M12 3.5c2.2 2.3 3.4 5.1 3.4 8.5S14.2 18.2 12 20.5M12 3.5C9.8 5.8 8.6 8.6 8.6 12s1.2 6.2 3.4 8.5"/></svg>
+        </a>
+        {{ end }}{{ end }}
+      </div>
+    </div>
+
+    <div class="profile-copy">
+      <h1>{{ $p.name }}</h1>
+      <p class="profile-role">{{ $p.title }}</p>
+      <p class="profile-institution">{{ $p.institution }}</p>
+      {{ with $p.department }}{{ if ne . "" }}<p class="profile-department">{{ . }}</p>{{ end }}{{ end }}
+
+      <div class="profile-meta">
+        {{ with $p.email }}{{ if ne . "" }}
+        <p>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.5h17v11h-17v-11Zm.7.7L12 13l7.8-5.8M4.2 16.8l5.5-5M19.8 16.8l-5.5-5"/></svg>
+          <a href="mailto:{{ . }}">{{ . }}</a>
+        </p>
+        {{ end }}{{ end }}
+
+        {{ with $p.location }}{{ if ne . "" }}
+        <p>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-5.3 6-11a6 6 0 1 0-12 0c0 5.7 6 11 6 11Z"/><circle cx="12" cy="10" r="2.2"/></svg>
+          <span>{{ . }}</span>
+        </p>
+        {{ end }}{{ end }}
+      </div>
+    </div>
+  </section>
+
+  <section class="home-section">
+    <h2 class="section-heading">About</h2>
+    <div class="academic-content">
+      <p>{{ $p.about }}</p>
+      {{ with $p.education }}
+      <ul class="education-list">
+        {{ range . }}<li>{{ . }}</li>{{ end }}
+      </ul>
+      {{ end }}
+    </div>
+  </section>
+
+  <section class="home-section">
+    <h2 class="section-heading">Research Interests</h2>
+    {{ with $p.research_interests }}
+    <ul class="interest-list">
+      {{ range . }}<li>{{ . }}</li>{{ end }}
+    </ul>
+    {{ end }}
+  </section>
+
+  {{ if $p.site.show_selected_publications }}
+    {{ $count := $p.site.selected_publications_count | default 3 }}
+    <section class="home-section">
+      <h2 class="section-heading">Selected Publications</h2>
+      {{ partial "publications.html" (dict "selectedOnly" true "limit" $count) }}
+      {{ with .Site.GetPage "/publications" }}<a class="section-link" href="{{ .RelPermalink }}">View all publications <span aria-hidden="true">→</span></a>{{ end }}
+    </section>
+  {{ end }}
+</div>
+{{ end }}

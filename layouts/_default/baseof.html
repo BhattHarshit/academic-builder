@@ -1,0 +1,241 @@
+{{ $p := .Site.Data.profile }}
+{{ $site := $p.site }}
+{{ $appearance := $p.appearance }}
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang | default "en" }}" class="no-js">
+<head>
+  <script>
+    (function () {
+      document.documentElement.classList.remove('no-js');
+      try {
+        const saved = localStorage.getItem('theme');
+        const fallback = '{{ $site.default_theme | default "system" }}';
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const dark = saved ? saved === 'dark' : (fallback === 'dark' || (fallback === 'system' && systemDark));
+        document.documentElement.classList.toggle('dark', dark);
+      } catch (e) {}
+    })();
+  </script>
+
+  {{ $defaultDescription := $site.description | default $p.about }}
+  {{ $description := .Description | default (.Summary | plainify) | default $defaultDescription }}
+  {{ $pageTitle := cond .IsHome $p.name (printf "%s | %s" .Title $p.name) }}
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ $description | plainify | truncate 170 }}">
+  {{ with $site.keywords }}<meta name="keywords" content="{{ delimit . ", " }}">{{ end }}
+  <meta name="author" content="{{ $p.name }}">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1e22">
+
+  <title>{{ $pageTitle }}</title>
+  <link rel="canonical" href="{{ .Permalink }}">
+  <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
+  {{ with .OutputFormats.Get "RSS" }}<link rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}" href="{{ .RelPermalink }}">{{ end }}
+
+  <meta property="og:title" content="{{ $pageTitle }}">
+  <meta property="og:description" content="{{ $description | plainify | truncate 170 }}">
+  <meta property="og:type" content="{{ if .IsHome }}profile{{ else }}article{{ end }}">
+  <meta property="og:url" content="{{ .Permalink }}">
+  {{ with $p.avatar }}<meta property="og:image" content="{{ . | absURL }}">{{ end }}
+
+  <link rel="stylesheet" href="{{ "css/site.css" | relURL }}">
+  <style>
+    :root {
+      --sidebar-width: {{ $appearance.sidebar_width | default "196px" }};
+      --content-width: {{ $appearance.content_width | default "1040px" }};
+      --page-width: {{ $appearance.page_width | default "900px" }};
+      --accent: {{ $appearance.accent_light | default "#1d5f8a" }};
+      --accent-hover: {{ $appearance.accent_light_hover | default "#154866" }};
+    }
+    html.dark {
+      --accent: {{ $appearance.accent_dark | default "#8cc7ef" }};
+      --accent-hover: {{ $appearance.accent_dark_hover | default "#b7ddf8" }};
+    }
+  </style>
+
+  {{ if .Params.math }}
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$', '$$']] },
+      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  {{ end }}
+
+  {{ if .IsHome }}
+    {{ $sameAs := slice }}
+    {{ with $p.social.github }}{{ if ne . "" }}{{ $sameAs = $sameAs | append . }}{{ end }}{{ end }}
+    {{ with $p.social.scholar }}{{ if ne . "" }}{{ $sameAs = $sameAs | append . }}{{ end }}{{ end }}
+    {{ with $p.social.orcid }}{{ if ne . "" }}{{ $sameAs = $sameAs | append . }}{{ end }}{{ end }}
+    {{ with $p.social.linkedin }}{{ if ne . "" }}{{ $sameAs = $sameAs | append . }}{{ end }}{{ end }}
+    {{ with $p.social.website }}{{ if ne . "" }}{{ $sameAs = $sameAs | append . }}{{ end }}{{ end }}
+    {{ $person := dict "@context" "https://schema.org" "@type" "Person" "name" $p.name "jobTitle" $p.title "affiliation" $p.institution "email" $p.email "url" .Permalink "sameAs" $sameAs }}
+    <script type="application/ld+json">{{ $person | jsonify | safeJS }}</script>
+  {{ end }}
+</head>
+
+<body>
+  {{ $current := . }}
+  {{ $navPages := .Site.Home.Pages.ByWeight }}
+  {{ $cvPath := $p.cv }}
+  {{ $showCV := false }}
+  {{ if $cvPath }}{{ $showCV = fileExists (printf "static/%s" $cvPath) }}{{ end }}
+  {{ $searchEnabled := $site.enable_search | default false }}
+
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <div class="site-layout">
+    <aside class="site-sidebar" aria-label="Site navigation">
+      <div class="sidebar-inner">
+        <div>
+          <a href="{{ "" | relURL }}" class="site-brand" aria-label="{{ $p.name }} home">{{ $p.name }}</a>
+
+          <nav class="desktop-nav" aria-label="Primary navigation">
+            <a href="{{ "" | relURL }}" class="nav-link{{ if .IsHome }} active{{ end }}"{{ if .IsHome }} aria-current="page"{{ end }}>Home</a>
+
+            {{ range $navPages }}
+              {{ if ne .Params.menu false }}
+                {{ $active := eq $current.RelPermalink .RelPermalink }}
+                {{ if and .IsSection (hasPrefix $current.RelPermalink .RelPermalink) }}{{ $active = true }}{{ end }}
+                {{ $href := .RelPermalink }}
+                {{ $external := false }}
+                {{ with .Params.external_url }}{{ if ne . "" }}{{ $href = . }}{{ $external = true }}{{ end }}{{ end }}
+                <a href="{{ $href }}" class="nav-link{{ if $active }} active{{ end }}"{{ if $active }} aria-current="page"{{ end }}{{ if $external }} target="_blank" rel="noopener noreferrer"{{ end }}>
+                  <span>{{ .LinkTitle }}</span>
+                  {{ if $external }}<span class="external-mark" aria-hidden="true">↗</span>{{ end }}
+                </a>
+              {{ end }}
+            {{ end }}
+
+            {{ if $showCV }}
+              <a href="{{ $cvPath | relURL }}" target="_blank" rel="noopener" class="nav-link">
+                <span>{{ $p.cv_label | default "CV" }}</span><span class="external-mark" aria-hidden="true">↗</span>
+              </a>
+            {{ end }}
+          </nav>
+        </div>
+
+        <div class="sidebar-utilities" aria-label="Site utilities">
+          {{ if $searchEnabled }}
+          <button class="utility-button search-toggle" type="button" aria-label="Search site" title="Search (Ctrl/⌘ K)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+          </button>
+          {{ end }}
+
+          <button class="utility-button theme-toggle" type="button" aria-label="Switch color theme">
+            <svg class="theme-icon moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.7 8.7 0 1 0 20.2 15.4Z"/></svg>
+            <svg class="theme-icon sun-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="site-content-column">
+      <header class="mobile-header">
+        <a href="{{ "" | relURL }}" class="mobile-brand" aria-label="{{ $p.name }} home">{{ $p.name }}</a>
+        <div class="mobile-actions">
+          {{ if $searchEnabled }}
+          <button class="icon-button search-toggle" type="button" aria-label="Search site">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+          </button>
+          {{ end }}
+
+          <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme">
+            <svg class="theme-icon moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.7 8.7 0 1 0 20.2 15.4Z"/></svg>
+            <svg class="theme-icon sun-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+          </button>
+
+          <button id="menu-toggle" class="icon-button menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-nav">
+            <svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            <svg class="close-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile navigation" hidden>
+        <div class="mobile-nav-inner">
+          <a href="{{ "" | relURL }}" class="mobile-nav-link{{ if .IsHome }} active{{ end }}"{{ if .IsHome }} aria-current="page"{{ end }}>Home</a>
+
+          {{ range $navPages }}
+            {{ if ne .Params.menu false }}
+              {{ $active := eq $current.RelPermalink .RelPermalink }}
+              {{ if and .IsSection (hasPrefix $current.RelPermalink .RelPermalink) }}{{ $active = true }}{{ end }}
+              {{ $href := .RelPermalink }}
+              {{ $external := false }}
+              {{ with .Params.external_url }}{{ if ne . "" }}{{ $href = . }}{{ $external = true }}{{ end }}{{ end }}
+              <a href="{{ $href }}" class="mobile-nav-link{{ if $active }} active{{ end }}"{{ if $active }} aria-current="page"{{ end }}{{ if $external }} target="_blank" rel="noopener noreferrer"{{ end }}>
+                {{ .LinkTitle }}{{ if $external }} <span aria-hidden="true">↗</span>{{ end }}
+              </a>
+            {{ end }}
+          {{ end }}
+
+          {{ if $showCV }}
+            <a href="{{ $cvPath | relURL }}" target="_blank" rel="noopener" class="mobile-nav-link">{{ $p.cv_label | default "CV" }} <span aria-hidden="true">↗</span></a>
+          {{ end }}
+        </div>
+      </nav>
+
+      <main id="main-content" class="site-main">{{ block "main" . }}{{ end }}</main>
+
+      <footer class="site-footer">
+      <div class="footer-inner">
+      <span>
+            &copy; {{ now.Year }} {{ .Site.Data.profile.name }}.
+            Built with
+            <a
+           href="https://github.com/BhattHarshit/academic-builder"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="footer-link"
+           >Academic Builder</a>.
+      </span>
+      </div>
+      </footer>
+    </div>
+  </div>
+
+  {{ if $site.enable_back_to_top }}
+  <button id="back-to-top" class="back-to-top" type="button" aria-label="Go to top" title="Go to top">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5"/><path d="m6.5 10.5 5.5-5.5 5.5 5.5"/></svg>
+  </button>
+  {{ end }}
+
+  {{ if $searchEnabled }}
+    {{ $searchIndex := slice }}
+    {{ range .Site.RegularPages }}
+      {{ if ne .Params.search false }}
+        {{ $searchIndex = $searchIndex | append (dict "title" .Title "url" .RelPermalink "summary" (.Summary | plainify | truncate 220) "content" (.Plain | truncate 6000)) }}
+      {{ end }}
+    {{ end }}
+    <script id="site-search-index" type="application/json">{{ $searchIndex | jsonify | safeJS }}</script>
+
+    <div id="search-dialog" class="search-dialog" hidden>
+      <div class="search-backdrop" data-search-close></div>
+      <section class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
+        <div class="search-heading">
+          <div>
+            <p class="eyebrow">Site search</p>
+            <h2 id="search-title">Find a page</h2>
+          </div>
+          <button class="icon-button search-close" type="button" aria-label="Close search" data-search-close>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <label class="search-input-wrap">
+          <span class="sr-only">Search pages</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+          <input id="site-search-input" type="search" autocomplete="off" placeholder="Search research, publications, teaching…">
+          <kbd>Esc</kbd>
+        </label>
+        <div id="search-results" class="search-results" aria-live="polite"></div>
+      </section>
+    </div>
+  {{ end }}
+
+  <script defer src="{{ "js/site.js" | relURL }}"></script>
+</body>
+</html>

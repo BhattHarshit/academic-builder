@@ -1,0 +1,40 @@
+{{ $items := site.Data.publications.publication }}
+{{ $selectedOnly := .selectedOnly | default false }}
+{{ $limit := .limit | default 0 }}
+{{ if $selectedOnly }}{{ $items = where $items "selected" true }}{{ end }}
+{{ $items = sort $items "year" "desc" }}
+{{ if gt $limit 0 }}{{ $items = first $limit $items }}{{ end }}
+
+{{ if $items }}
+<div class="publication-list">
+  {{ range $items }}
+  <article class="publication-item">
+    <div class="publication-year">{{ .year }}</div>
+    <div>
+      <h3 class="publication-title">
+        {{ .title }}{{ if and .selected (not $selectedOnly) }}<span class="selected-mark">Selected</span>{{ end }}
+      </h3>
+      {{ with .authors }}<p class="publication-authors">{{ . }}</p>{{ end }}
+      {{ with .venue }}<p class="publication-venue">{{ . }}</p>{{ end }}
+      {{ with .abstract }}<p class="publication-abstract">{{ . }}</p>{{ end }}
+
+      {{ if or .doi .pdf .code .bibtex }}
+      <div class="publication-links">
+        {{ with .doi }}{{ if ne . "" }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">DOI ↗</a>{{ end }}{{ end }}
+        {{ with .pdf }}{{ if ne . "" }}<a href="{{ . | relURL }}" target="_blank" rel="noopener">PDF ↗</a>{{ end }}{{ end }}
+        {{ with .code }}{{ if ne . "" }}<a href="{{ . }}" target="_blank" rel="noopener noreferrer">Code ↗</a>{{ end }}{{ end }}
+        {{ with .bibtex }}{{ if ne . "" }}
+          <details class="pub-bibtex">
+            <summary>BibTeX</summary>
+            <pre><code>{{ . }}</code></pre>
+          </details>
+        {{ end }}{{ end }}
+      </div>
+      {{ end }}
+    </div>
+  </article>
+  {{ end }}
+</div>
+{{ else }}
+<p class="search-empty">No publications have been added yet.</p>
+{{ end }}

@@ -1,0 +1,18 @@
+# Core Hugo settings. Most users should not need to edit this file.
+# Personal information and site options live in data/profile.toml.
+baseURL = "https://example.org/"
+languageCode = "en-us"
+title = "Academic Website"
+disableKinds = ["taxonomy", "term"]
+enableRobotsTXT = true
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    noClasses = true
+    guessSyntax = true
+
+[outputs]
+  home = ["HTML", "RSS"]

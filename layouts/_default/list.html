@@ -1,0 +1,23 @@
+{{ define "main" }}
+<section class="content-shell page-shell">
+  <header class="page-heading-wrap">
+    {{ with .Params.kicker }}<p class="page-kicker">{{ . }}</p>{{ end }}
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p class="page-description">{{ . }}</p>{{ end }}
+  </header>
+
+  {{ if .Content }}<div class="academic-content">{{ .Content }}</div>{{ end }}
+
+  {{ if .Pages }}
+  <div class="entry-list">
+    {{ range .Pages.ByWeight }}
+    <article class="entry-card">
+      <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      <div class="academic-content entry-summary">{{ .Summary }}</div>
+      {{ if .Truncated }}<a href="{{ .RelPermalink }}" class="read-more">Read more <span aria-hidden="true">→</span></a>{{ end }}
+    </article>
+    {{ end }}
+  </div>
+  {{ end }}
+</section>
+{{ end }}

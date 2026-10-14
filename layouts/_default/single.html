@@ -1,0 +1,26 @@
+{{ define "main" }}
+{{ $showTOC := .Params.toc | default false }}
+{{ if $showTOC }}<div class="page-layout has-toc">{{ end }}
+
+<section class="content-shell page-shell">
+  <header class="page-heading-wrap">
+    {{ with .Params.kicker }}<p class="page-kicker">{{ . }}</p>{{ end }}
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p class="page-description">{{ . }}</p>{{ end }}
+  </header>
+
+  {{ if and (.Parent) (ne .Parent.RelPermalink ("" | relURL)) }}
+  <a href="{{ .Parent.RelPermalink }}" class="back-link"><span aria-hidden="true">←</span> Back to {{ .Parent.Title }}</a>
+  {{ end }}
+
+  <div class="academic-content">{{ .Content }}</div>
+</section>
+
+{{ if $showTOC }}
+  <aside class="page-toc" aria-label="On this page">
+    <p class="page-toc-title">On this page</p>
+    {{ .TableOfContents }}
+  </aside>
+</div>
+{{ end }}
+{{ end }}

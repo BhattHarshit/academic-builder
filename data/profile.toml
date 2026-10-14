@@ -1,0 +1,64 @@
+# ================================================================
+# EDIT THIS FILE TO PERSONALIZE YOUR WEBSITE
+# ================================================================
+# Site-wide identity, links, appearance, and feature switches live here.
+# Content pages remain independent Markdown files inside content/.
+
+name = "Your Name"
+title = "PhD Student in Applied Mathematics"
+institution = "Your University"
+department = "Department of Mathematics"
+email = "you@university.edu"
+location = "City, State"
+avatar = "images/avatar.svg"
+avatar_alt = "Profile portrait"
+
+# Keep this short: usually 2-4 sentences.
+about = "I am a graduate student interested in applied mathematics and scientific computing. My work focuses on developing scalable computational methods for challenging problems in science and engineering."
+
+education = [
+  "Ph.D. in Applied Mathematics, Your University (expected 20XX)",
+  "M.S. in Mathematics, Previous University (20XX)"
+]
+
+research_interests = [
+  "Numerical linear algebra",
+  "Scientific computing",
+  "Optimization",
+  "Randomized algorithms"
+]
+
+# PDF shown as a navigation tab. Replace static/files/cv.pdf with your CV.
+cv = "files/cv.pdf"
+cv_label = "CV"
+
+[site]
+description = "Academic website of Your Name, PhD student in applied mathematics."
+keywords = ["applied mathematics", "scientific computing", "numerical linear algebra"]
+default_theme = "system" # system, light, or dark
+enable_search = true
+enable_back_to_top = true
+show_selected_publications = true
+selected_publications_count = 3
+show_home_attribution = true
+attribution_name = "Harshit Bhatt"
+attribution_url = "https://bhattharshit.github.io/"
+
+[appearance]
+# Choose circle or square.
+avatar_shape = "circle"
+sidebar_width = "196px"
+content_width = "1040px"
+page_width = "900px"
+accent_light = "#1d5f8a"
+accent_light_hover = "#154866"
+accent_dark = "#8cc7ef"
+accent_dark_hover = "#b7ddf8"
+
+# Leave a URL empty ("") to hide that profile link.
+[social]
+github = ""
+scholar = ""
+orcid = ""
+linkedin = ""
+website = ""
